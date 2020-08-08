@@ -17,10 +17,11 @@ git clone https://github.com/carolynvs/stingoftheviper.git
 cd stingoftheviper/
 ```
 
-Now let's build the CLI (stingoftheviper):
+Now let's build the CLI (stingoftheviper) and make sure everything is still working:
 
 ```
 go build .
+go test ./...
 ```
 
 We are now ready to try out a few scenarios to test out the precedence order. First let's run it with no flags
