@@ -3,6 +3,8 @@
 This demonstrates how to integrate spf13/cobra with spf13/viper such command-line flags have the highest precedence,
 then environment variables, then config file values, and then defaults set on command-line flags.
 
+📬 Read the accompanying blog post that explains this example code. [Sting of the Viper: Getting Cobra and Viper to work together](https://carolynvanslyck.com/blog/2020/08/sting-of-the-viper/)
+
 It also handles binding command-line flags that have dashes properly to environment variables with underscores. 
 For example, `--favorite-color` is set with the environment variable `FAVORITE_COLOR`.
 
