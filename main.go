@@ -89,8 +89,8 @@ func initializeConfig(cmd *cobra.Command) error {
 	// avoid conflicts.
 	v.SetEnvPrefix(envPrefix)
 
-	// Bind flags to environment variables
-	// Works great for simple flags, but needs help for flags
+	// Bind to environment variables
+	// Works great for simple config names, but needs help for names
 	// like --favorite-color which we fix in the bindFlags function
 	v.AutomaticEnv()
 
