@@ -56,9 +56,9 @@ func NewRootCommand() *cobra.Command {
 		},
 	}
 
-	// Define cobra flags, the default value has the lowest (least significant precedence)
+	// Define cobra flags, the default value has the lowest (least significant) precedence
 	rootCmd.Flags().IntVarP(&number, "number", "n", 7, "What is the magic number?")
-	rootCmd.Flags().StringVarP(&color, "favorite-color", "c", "red", "Should come from flag first, then env var DEBUG_STUFF then the config file, then the default last")
+	rootCmd.Flags().StringVarP(&color, "favorite-color", "c", "red", "Should come from flag first, then env var STING_FAVORITE_COLOR then the config file, then the default last")
 
 	return rootCmd
 }
