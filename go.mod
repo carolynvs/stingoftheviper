@@ -1,4 +1,4 @@
-module github.com/carolnvs/stingoftheviper
+module github.com/carolynvs/stingoftheviper
 
 go 1.13
 
