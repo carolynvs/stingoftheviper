@@ -114,6 +114,12 @@ func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 		if !f.Changed && v.IsSet(f.Name) {
 			val := v.Get(f.Name)
 			cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
+		} else if !f.Changed {
+			key := strings.ToLower(strings.ReplaceAll(f.Name, "-", ""))
+			if v.IsSet(key) {
+				val := v.Get(key)
+				cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
+			}
 		}
 	})
 }
