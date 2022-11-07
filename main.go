@@ -10,13 +10,17 @@ import (
 	"github.com/spf13/viper"
 )
 
-const (
+// I'm declaring as vars so I can test easier, I recommend declaring these as constants
+var (
 	// The name of our config file, without the file extension because viper supports many different config file languages.
 	defaultConfigFilename = "stingoftheviper"
 
 	// The environment variable prefix of all environment variables bound to our command line flags.
 	// For example, --number is bound to STING_NUMBER.
 	envPrefix = "STING"
+
+	// Replace hyphenated flag names with camelCase in the config file
+	replaceHyphenWithCamelCase = false
 )
 
 func main() {
@@ -107,9 +111,17 @@ func initializeConfig(cmd *cobra.Command) error {
 // Bind each cobra flag to its associated viper configuration (config file and environment variable)
 func bindFlags(cmd *cobra.Command, v *viper.Viper) {
 	cmd.Flags().VisitAll(func(f *pflag.Flag) {
+		// Determine the naming convention of the flags when represented in the config file
+		configName := f.Name
+		// If using camelCase in the config file, replace hyphens with a camelCased string.
+		// Since viper does case-insensitive comparisons, we don't need to bother fixing the case, and only need to remove the hyphens.
+		if replaceHyphenWithCamelCase {
+			configName = strings.ReplaceAll(f.Name, "-", "")
+		}
+
 		// Apply the viper config value to the flag when the flag is not set and viper has a value
-		if !f.Changed && v.IsSet(f.Name) {
-			val := v.Get(f.Name)
+		if !f.Changed && v.IsSet(configName) {
+			val := v.Get(configName)
 			cmd.Flags().Set(f.Name, fmt.Sprintf("%v", val))
 		}
 	})

@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"testing"
@@ -13,7 +12,7 @@ import (
 
 func TestPrecedence(t *testing.T) {
 	// Run the tests in a temporary directory
-	tmpDir, err := ioutil.TempDir("", "stingoftheviper")
+	tmpDir, err := os.MkdirTemp("", "stingoftheviper")
 	require.NoError(t, err, "error creating a temporary test directory")
 	testDir, err := os.Getwd()
 	require.NoError(t, err, "error getting the current working directory")
@@ -23,24 +22,39 @@ func TestPrecedence(t *testing.T) {
 
 	// Set favorite-color with the config file
 	t.Run("config file", func(t *testing.T) {
-		// Copy the config file into our temporary test directory
-		configB, err := ioutil.ReadFile(filepath.Join(testDir, "stingoftheviper.toml"))
-		require.NoError(t, err, "error reading test config file")
-		err = ioutil.WriteFile(filepath.Join(tmpDir, "stingoftheviper.toml"), configB, 0644)
-		require.NoError(t, err, "error writing test config file")
-		defer os.Remove(filepath.Join(tmpDir, "stingoftheviper.toml"))
+		testcases := []struct {
+			name                       string
+			configFile                 string
+			replaceHyphenWithCamelCase bool
+		}{
+			{name: "hyphen", configFile: "testdata/config-hyphen.toml"},
+			{name: "camelCase", configFile: "testdata/config-camel.toml", replaceHyphenWithCamelCase: true},
+		}
+		for _, tc := range testcases {
+			t.Run(tc.name, func(t *testing.T) {
+				replaceHyphenWithCamelCase = tc.replaceHyphenWithCamelCase
+				defer func() { replaceHyphenWithCamelCase = false }()
 
-		// Run ./stingoftheviper
-		cmd := NewRootCommand()
-		output := &bytes.Buffer{}
-		cmd.SetOut(output)
-		cmd.Execute()
+				// Copy the config file into our temporary test directory
+				configB, err := os.ReadFile(filepath.Join(testDir, tc.configFile))
+				require.NoError(t, err, "error reading test config file")
+				err = os.WriteFile(filepath.Join(tmpDir, "stingoftheviper.toml"), configB, 0644)
+				require.NoError(t, err, "error writing test config file")
+				defer os.Remove(filepath.Join(tmpDir, "stingoftheviper.toml"))
 
-		gotOutput := output.String()
-		wantOutput := `Your favorite color is: blue
+				// Run ./stingoftheviper
+				cmd := NewRootCommand()
+				output := &bytes.Buffer{}
+				cmd.SetOut(output)
+				cmd.Execute()
+
+				gotOutput := output.String()
+				wantOutput := `Your favorite color is: blue
 The magic number is: 7
 `
-		assert.Equal(t, wantOutput, gotOutput, "expected the color from the config file and the number from the flag default")
+				assert.Equal(t, wantOutput, gotOutput, "expected the color from the config file and the number from the flag default")
+			})
+		}
 	})
 
 	// Set favorite-color with an environment variable
